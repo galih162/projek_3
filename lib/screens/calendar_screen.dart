@@ -15,25 +15,25 @@ class _CalenderScreenState extends State<CalenderScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Today',
-        style: GoogleFonts.poppins(
-          fontSize: 24,
-          color: Color(0xFF584A4A),
-          fontWeight: FontWeight.bold,
-        )
+        title: Text(
+          'Today',
+          style: GoogleFonts.poppins(
+            fontSize: 24,
+            color: Color(0xFF584A4A),
+            fontWeight: FontWeight.bold,
+          ),
         ),
-       leading: IconButton(
-       icon: Icon(
-        Icons.arrow_back_ios,
-        size: 24,
-        color: Color(0xFF584A4A),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            size: 24,
+            color: Color(0xFF584A4A),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        onPressed: () {
-          Navigator.pop(context);
-      },
-    ),
       ),
-
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -48,7 +48,6 @@ class _CalenderScreenState extends State<CalenderScreen> {
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
@@ -60,41 +59,46 @@ class _CalenderScreenState extends State<CalenderScreen> {
               ),
             ),
           ),
-
-          SizedBox(height: 30,),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(7, (index) {
-                  return index == 2
-                  ? CircleAvatar(
-                    backgroundColor: Color(0xFFA0D7C8),
-                    radius: 18.0,
-                    child: Text(
-                      days[index],
-                      style: TextStyle(
-                        fontWeight: index == 2 ? FontWeight.bold : FontWeight.normal,
-                         color: Color(0xFF584A4A),
-                         fontSize: 14,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                  : Text(
-                    days[index],
-                    style: TextStyle(
-                      fontWeight: index == 2 ? FontWeight.bold : FontWeight.normal,
-                      color: index == 2 ? Colors.black : Colors.grey,
-                      fontSize: 16,
-                    ),
-                  );
-                }),
-              ),
+          SizedBox(
+            height: 30,
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(7, (index) {
+                return index == 2
+                    ? CircleAvatar(
+                        backgroundColor: Color(0xFFA0D7C8),
+                        radius: 18.0,
+                        child: Text(
+                          days[index],
+                          style: TextStyle(
+                            fontWeight: index == 2
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color: Color(0xFF584A4A),
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : Text(
+                        days[index],
+                        style: TextStyle(
+                          fontWeight:
+                              index == 2 ? FontWeight.bold : FontWeight.normal,
+                          color: index == 2 ? Colors.black : Colors.grey,
+                          fontSize: 16,
+                        ),
+                      );
+              }),
             ),
-
-          SizedBox(height: 20,),
-
+          ),
+          SizedBox(
+            height: 20,
+          ),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16.0),
@@ -132,9 +136,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     ],
                   ),
                 ),
-
-                SizedBox(height: 20,),
-
+                SizedBox(
+                  height: 20,
+                ),
                 Container(
                   width: 368,
                   height: 71,
@@ -168,9 +172,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     ],
                   ),
                 ),
-
-                SizedBox(height: 20,),
-
+                SizedBox(
+                  height: 20,
+                ),
                 Container(
                   width: 368,
                   height: 71,
@@ -204,9 +208,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     ],
                   ),
                 ),
-
-                SizedBox(height: 20,),
-
+                SizedBox(
+                  height: 20,
+                ),
                 Container(
                   width: 368,
                   height: 71,
@@ -240,9 +244,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     ],
                   ),
                 ),
-
-                SizedBox(height: 20,),
-
+                SizedBox(
+                  height: 20,
+                ),
                 Container(
                   width: 368,
                   height: 71,
