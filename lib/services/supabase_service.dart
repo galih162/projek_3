@@ -8,7 +8,7 @@ class SupabaseService {
 
   late SupabaseClient client;
 
-  // Initialize Supabase
+  // Inisialisasi Supabase
   Future<void> initialize() async {
     await Supabase.initialize(
       url: 'https://bowngxwubyzewhrzhwsf.supabase.co',
@@ -17,259 +17,258 @@ class SupabaseService {
     client = Supabase.instance.client;
   }
 
-  // Register user - FIXED: Tidak langsung save session
+  // Registrasi pengguna dan simpan data profil ke tabel profiles
   Future<Map<String, dynamic>> registerUser({
     required String email,
     required String password,
+    required String name,
     required String course,
+    DateTime? birthDate,
+    String? phoneNumber,
   }) async {
     try {
-      print('Attempting registration for email: $email');
-      
-      final AuthResponse response = await client.auth.signUp(
+      final response = await client.auth.signUp(
         email: email,
         password: password,
-        data: {
-          'course': course,
-        },
       );
 
-      print('Registration response: ${response.user?.email}');
-
       if (response.user != null) {
-        // PENTING: Sign out setelah register agar user harus login manual
-        await client.auth.signOut();
-        
+        // Simpan data profil ke tabel profiles
+        final profileResult = await client.from('profiles').insert({
+          'id': response.user!.id,
+          'email': email,
+          'name': name,
+          'course': course,
+          'birth_date': birthDate?.toIso8601String(),
+          'phone_number': phoneNumber,
+          'updated_at': DateTime.now().toIso8601String(),
+        }).select().single();
+
+        print('Pengguna terdaftar dan profil disimpan: ${profileResult['email']}');
         return {
           'success': true,
-          'message': 'Registration successful! Please login with your credentials.',
-          'user': response.user,
+          'message': 'Registrasi berhasil! Silakan login.',
         };
       } else {
         return {
           'success': false,
-          'message': 'Registration failed. Please try again.',
+          'message': 'Gagal mendaftar: Tidak ada data pengguna.',
         };
       }
-    } on AuthException catch (e) {
-      print('Registration AuthException: ${e.message}');
-      return {
-        'success': false,
-        'message': _getErrorMessage(e.message),
-      };
     } catch (e) {
-      print('Registration error: $e');
+      print('Kesalahan saat registrasi: $e');
       return {
         'success': false,
-        'message': 'An unexpected error occurred: ${e.toString()}',
+        'message': _getErrorMessage(e),
       };
     }
   }
 
-  // Login user - FIXED: Hanya save session jika login berhasil
+  // Login pengguna
   Future<Map<String, dynamic>> loginUser({
     required String email,
     required String password,
   }) async {
     try {
-      print('Attempting login for email: $email');
-      
-      final AuthResponse response = await client.auth.signInWithPassword(
+      final response = await client.auth.signInWithPassword(
         email: email,
         password: password,
       );
 
-      print('Login response user: ${response.user?.email}');
-      print('Login response session: ${response.session?.accessToken != null}');
-
-      if (response.user != null && response.session != null) {
-        // Save user data to SharedPreferences hanya setelah login berhasil
+      if (response.user != null) {
         await _saveUserToPrefs(response.user!);
-        
-        print('Login successful, user saved to preferences');
+        print('Login berhasil: ${response.user!.email}');
         return {
           'success': true,
-          'message': 'Login berhasil!',
-          'user': response.user,
+          'message': 'Login berhasil.',
         };
       } else {
-        print('Login failed: No user or session returned');
         return {
           'success': false,
-          'message': 'Login gagal. Periksa email dan password Anda.',
+          'message': 'Gagal login: Tidak ada data pengguna.',
         };
       }
-    } on AuthException catch (e) {
-      print('Login AuthException: ${e.message}');
-      return {
-        'success': false,
-        'message': _getErrorMessage(e.message),
-      };
     } catch (e) {
-      print('Login error: $e');
+      print('Kesalahan saat login: $e');
       return {
         'success': false,
-        'message': 'Terjadi kesalahan: ${e.toString()}',
+        'message': _getErrorMessage(e),
       };
     }
   }
 
-  // Check if user is logged in - FIXED: Cek Supabase session dulu, baru SharedPreferences
+  // Periksa apakah pengguna sudah login
   Future<bool> isUserLoggedIn() async {
     try {
-      // Cek Supabase session terlebih dahulu
       final User? user = client.auth.currentUser;
       final Session? session = client.auth.currentSession;
       
-      print('Current user from Supabase: ${user?.email}');
-      print('Current session exists: ${session != null}');
+      print('Pengguna saat ini dari Supabase: ${user?.email}');
+      print('Sesi saat ini ada: ${session != null}');
       
       if (user != null && session != null) {
-        // Jika ada session di Supabase, pastikan SharedPreferences juga sync
         await _saveUserToPrefs(user);
         return true;
       } else {
-        // Jika tidak ada session di Supabase, clear SharedPreferences
         await _clearUserFromPrefs();
         return false;
       }
     } catch (e) {
-      print('Error checking login status: $e');
-      // Fallback ke SharedPreferences jika ada error
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.containsKey('user_email');
+      print('Kesalahan saat memeriksa status login: $e');
+      await _clearUserFromPrefs();
+      return false;
     }
   }
 
-  // Get current user data
-  Future<Map<String, dynamic>> getCurrentUser() async {
-    try {
-      final User? user = client.auth.currentUser;
-      if (user != null) {
-        return {
-          'id': user.id,
-          'email': user.email,
-          'course': user.userMetadata?['course'] ?? 'Unknown Course',
-          'name': user.userMetadata?['course'] ?? user.email?.split('@')[0] ?? 'User',
-        };
-      }
-      
-      // Fallback ke SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      return {
-        'email': prefs.getString('user_email') ?? '',
-        'course': prefs.getString('user_course') ?? '',
-        'name': prefs.getString('user_course') ?? prefs.getString('user_email')?.split('@')[0] ?? 'User',
-      };
-    } catch (e) {
-      print('Error getting current user: $e');
-      return {};
-    }
-  }
-
-  // Logout user - FIXED: Clear both Supabase session and SharedPreferences
+  // Logout pengguna
   Future<void> logoutUser() async {
     try {
-      print('Logging out user...');
+      print('Mengeluarkan pengguna...');
       await client.auth.signOut();
       await _clearUserFromPrefs();
-      print('Logout successful');
+      print('Logout berhasil');
     } catch (e) {
-      print('Logout error: $e');
-      // Tetap clear SharedPreferences meskipun Supabase logout error
+      print('Kesalahan logout: $e');
       await _clearUserFromPrefs();
     }
   }
 
-  // Save user data to SharedPreferences
+  // Simpan data pengguna ke SharedPreferences
   Future<void> _saveUserToPrefs(User user) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_id', user.id);
       await prefs.setString('user_email', user.email ?? '');
-      await prefs.setString('user_course', user.userMetadata?['course'] ?? '');
-      print('User data saved to preferences: ${user.email}');
+      print('Data pengguna disimpan ke preferensi: ${user.email}');
     } catch (e) {
-      print('Error saving user to preferences: $e');
+      print('Kesalahan saat menyimpan preferensi pengguna: $e');
     }
   }
 
-  // Clear user data from SharedPreferences
+  // Bersihkan data pengguna dari SharedPreferences
   Future<void> _clearUserFromPrefs() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('user_id');
-      await prefs.remove('user_email');
-      await prefs.remove('user_course');
-      print('User data cleared from preferences');
+      await prefs.clear();
+      print('Data pengguna dihapus dari preferensi');
     } catch (e) {
-      print('Error clearing user preferences: $e');
+      print('Kesalahan saat menghapus preferensi pengguna: $e');
     }
   }
 
-  // Get user-friendly error messages
-  String _getErrorMessage(String error) {
-    print('Original error: $error');
-    
-    if (error.toLowerCase().contains('invalid login credentials')) {
-      return 'Email atau password salah. Periksa kembali data Anda.';
-    } else if (error.toLowerCase().contains('email not confirmed')) {
-      return 'Silakan konfirmasi email Anda terlebih dahulu.';
-    } else if (error.toLowerCase().contains('user already registered')) {
-      return 'Email sudah terdaftar. Silakan login.';
-    } else if (error.toLowerCase().contains('weak password')) {
-      return 'Password terlalu lemah. Gunakan minimal 6 karakter.';
-    } else if (error.toLowerCase().contains('invalid email')) {
-      return 'Format email tidak valid.';
-    } else if (error.toLowerCase().contains('user not found')) {
-      return 'User tidak ditemukan. Periksa email Anda.';
-    } else if (error.toLowerCase().contains('signup disabled')) {
-      return 'Registrasi sedang dinonaktifkan.';
-    }
-    
-    return error;
-  }
-
-  // Method untuk reset password
-  Future<Map<String, dynamic>> resetPassword({required String email}) async {
+  // Ambil data pengguna saat ini
+  Future<Map<String, dynamic>> getCurrentUser() async {
     try {
-      await client.auth.resetPasswordForEmail(email);
+      final user = client.auth.currentUser;
+      if (user != null) {
+        return {
+          'id': user.id,
+          'email': user.email,
+        };
+      }
+      return {
+        'id': null,
+        'email': null,
+      };
+    } catch (e) {
+      print('Kesalahan saat mengambil pengguna saat ini: $e');
+      return {
+        'id': null,
+        'email': null,
+      };
+    }
+  }
+
+  // Simpan atau perbarui data profil ke tabel profiles
+  Future<Map<String, dynamic>> saveUserProfile({
+    required String userId,
+    required String email,
+    required String name,
+    String? bio,
+    DateTime? birthDate,
+    String? phoneNumber,
+    String? course,
+  }) async {
+    try {
+      final response = await client.from('profiles').upsert({
+        'id': userId,
+        'email': email,
+        'name': name,
+        'bio': bio,
+        'birth_date': birthDate?.toIso8601String(),
+        'phone_number': phoneNumber,
+        'course': course,
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'id').select().single();
+
+      print('Profil disimpan: ${response['email']}');
       return {
         'success': true,
-        'message': 'Email reset password telah dikirim.',
-      };
-    } on AuthException catch (e) {
-      return {
-        'success': false,
-        'message': _getErrorMessage(e.message),
-      };
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'Gagal mengirim email reset.',
-      };
-    }
-  }
-
-  // Method untuk cek status user di database
-  Future<Map<String, dynamic>> checkUserStatus(String email) async {
-    try {
-      final response = await client
-          .from('profiles') // Sesuaikan dengan nama table Anda
-          .select()
-          .eq('email', email)
-          .maybeSingle();
-      
-      return {
-        'exists': response != null,
+        'message': 'Profil berhasil disimpan.',
         'data': response,
       };
     } catch (e) {
-      print('Error checking user status: $e');
+      print('Kesalahan saat menyimpan profil: $e');
       return {
-        'exists': false,
-        'data': null,
+        'success': false,
+        'message': 'Gagal menyimpan profil: ${e.toString()}',
       };
     }
+  }
+
+  // Ambil data profil dari tabel profiles
+  Future<Map<String, dynamic>> getUserProfile(String userId) async {
+    try {
+      final response = await client
+          .from('profiles')
+          .select()
+          .eq('id', userId)
+          .maybeSingle();
+
+      if (response != null) {
+        print('Profil ditemukan: ${response['email']}');
+        return {
+          'success': true,
+          'data': {
+            'id': response['id'],
+            'email': response['email'],
+            'name': response['name'] ?? '',
+            'bio': response['bio'] ?? '',
+            'birth_date': response['birth_date'] != null
+                ? DateTime.parse(response['birth_date'])
+                : null,
+            'phone_number': response['phone_number'] ?? '',
+            'course': response['course'] ?? '',
+          },
+        };
+      } else {
+        print('Profil tidak ditemukan untuk userId: $userId');
+        return {
+          'success': false,
+          'message': 'Profil tidak ditemukan.',
+        };
+      }
+    } catch (e) {
+      print('Kesalahan saat mengambil profil: $e');
+      return {
+        'success': false,
+        'message': 'Gagal mengambil profil: ${e.toString()}',
+      };
+    }
+  }
+
+  // Helper untuk menangani pesan error
+  String _getErrorMessage(dynamic e) {
+    if (e is AuthException) {
+      switch (e.message) {
+        case 'Invalid login credentials':
+          return 'Email atau kata sandi salah.';
+        case 'User already registered':
+          return 'Email sudah terdaftar.';
+        default:
+          return 'Terjadi kesalahan: ${e.message}';
+      }
+    }
+    return 'Terjadi kesalahan: ${e.toString()}';
   }
 }
