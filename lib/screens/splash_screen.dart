@@ -1,9 +1,163 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:projek2_aplikasi_todolist/services/supabase_service.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  final SupabaseService _supabaseService = SupabaseService();
+  
+  // Controllers untuk form
+  final TextEditingController _registerEmailController = TextEditingController();
+  final TextEditingController _registerCourseController = TextEditingController();
+  final TextEditingController _registerPasswordController = TextEditingController();
+  final TextEditingController _registerConfirmPasswordController = TextEditingController();
+  
+  final TextEditingController _loginEmailController = TextEditingController();
+  final TextEditingController _loginPasswordController = TextEditingController();
+
+  // State untuk password visibility
+  bool _isRegisterPasswordVisible = false;
+  bool _isRegisterConfirmPasswordVisible = false;
+  bool _isLoginPasswordVisible = false;
+  
+  // State untuk loading
+  bool _isRegisterLoading = false;
+  bool _isLoginLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserLogin();
+  }
+
+  // Check if user is already logged in
+  Future<void> _checkUserLogin() async {
+    final isLoggedIn = await _supabaseService.isUserLoggedIn();
+    if (isLoggedIn && mounted) {
+      // Auto navigate to home screen if user is logged in
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    }
+  }
+
+  // Register function - FIXED: Tidak langsung masuk, tapi kembali ke login
+  Future<void> _register() async {
+    if (_registerPasswordController.text != _registerConfirmPasswordController.text) {
+      _showSnackBar('Passwords do not match!', isError: true);
+      return;
+    }
+
+    if (_registerEmailController.text.isEmpty || 
+        _registerCourseController.text.isEmpty ||
+        _registerPasswordController.text.isEmpty) {
+      _showSnackBar('Please fill in all fields!', isError: true);
+      return;
+    }
+
+    setState(() {
+      _isRegisterLoading = true;
+    });
+
+    final result = await _supabaseService.registerUser(
+      email: _registerEmailController.text.trim(),
+      password: _registerPasswordController.text,
+      course: _registerCourseController.text.trim(),
+    );
+
+    setState(() {
+      _isRegisterLoading = false;
+    });
+
+    if (result['success']) {
+      // Clear register form
+      _registerEmailController.clear();
+      _registerCourseController.clear();
+      _registerPasswordController.clear();
+      _registerConfirmPasswordController.clear();
+      
+      _showSnackBar('Account created successfully! Please login with your credentials.', isError: false);
+      Navigator.pop(context); // Close register modal
+      
+      // Otomatis buka login modal setelah register berhasil
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _showLoginModal();
+      });
+    } else {
+      _showSnackBar(result['message'], isError: true);
+    }
+  }
+
+  // Login function
+  Future<void> _login() async {
+    if (_loginEmailController.text.isEmpty || _loginPasswordController.text.isEmpty) {
+      _showSnackBar('Please fill in all fields!', isError: true);
+      return;
+    }
+
+    setState(() {
+      _isLoginLoading = true;
+    });
+
+    final result = await _supabaseService.loginUser(
+      email: _loginEmailController.text.trim(),
+      password: _loginPasswordController.text,
+    );
+
+    setState(() {
+      _isLoginLoading = false;
+    });
+
+    if (result['success']) {
+      // Clear login form
+      _loginEmailController.clear();
+      _loginPasswordController.clear();
+      
+      _showSnackBar(result['message'], isError: false);
+      Navigator.pop(context); // Close modal
+      
+      // Navigate to home with proper route clearing
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false, // Remove all previous routes
+      );
+    } else {
+      _showSnackBar(result['message'], isError: true);
+    }
+  }
+
+  // Show snackbar
+  void _showSnackBar(String message, {required bool isError}) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.red : Colors.green,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _registerEmailController.dispose();
+    _registerCourseController.dispose();
+    _registerPasswordController.dispose();
+    _registerConfirmPasswordController.dispose();
+    _loginEmailController.dispose();
+    _loginPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +175,7 @@ class SplashScreen extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 36,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFFA0D7C8),
+                    color: const Color(0xFFA0D7C8),
                   ),
                 ),
                 ClipOval(
@@ -35,7 +189,7 @@ class SplashScreen extends StatelessWidget {
                           color: Colors.black26,
                           offset: Offset(0, 4),
                           blurRadius: 10,
-                          spreadRadius:20,
+                          spreadRadius: 20,
                         ),
                       ],
                     ),
@@ -51,23 +205,22 @@ class SplashScreen extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      'Get organized  your life',
+                      'Get organized your life',
                       style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF584A4A),
-                        
+                        color: const Color(0xFF584A4A),
                       ),
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      'simple and affective\n'
+                      'simple and effective\n'
                       'to-do list and task manager app\n'
                       'which helps you manage time\n',
                       style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF584A4A),
+                        color: const Color(0xFF584A4A),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -76,238 +229,10 @@ class SplashScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // CREATE ACCOUNT BUTTON
                     GestureDetector(
                       onTap: () {
-                        showModalBottomSheet(
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (context) {
-                            return StatefulBuilder(
-                              builder:
-                                  (BuildContext context, StateSetter setState) {
-                                return Wrap(
-                                  children: [
-                                    Container(
-                                      width: 440,
-                                      height: 550,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFFA0D7C8),
-                                        borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(30),
-                                          topLeft: Radius.circular(30),
-                                        ),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          SizedBox(height: 30),
-                                          Text(
-                                            'Create Account',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFF584A4A),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 25,
-                                          ),
-                                          SizedBox(
-                                            width: 400,
-                                            height: 60,
-                                            child: TextField(
-                                              decoration: InputDecoration(
-                                                labelStyle: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                                hintText: "infoexample.com",
-                                                hintStyle: TextStyle(color: Colors.white),
-                                                labelText: "username/email",
-                                                 enabledBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                      color: Colors.white,
-                                                      width: 3.0),
-                                                ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                    color: Colors.white,
-                                                    width: 3.0,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 20),
-                                          SizedBox(
-                                            width: 400,
-                                            height: 60,
-                                            child: TextField(
-                                              decoration: InputDecoration(
-                                                labelStyle: GoogleFonts.poppins(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                                hintText: "course",
-                                                 hintStyle: TextStyle(color: Colors.white),
-                                                labelText: "course",
-                                                 enabledBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                      color: Colors.white,
-                                                      width: 3.0),
-                                                ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                    color: Colors.white,
-                                                    width: 3.0,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 20),
-                                          SizedBox(
-                                            width: 400,
-                                            height: 60,
-                                            child: TextField(
-                                              decoration: InputDecoration(
-                                                labelStyle: GoogleFonts.poppins(
-                                                    fontSize: 16,
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                                hintText: "password",
-                                                 hintStyle: TextStyle(color: Colors.white),
-                                                labelText: "password",
-                                                suffixIcon: InkWell(
-                                                  onTap: () {},
-                                                  child: Icon(
-                                                    Icons.visibility_outlined,
-                                                    color: Colors.white,
-                                                    size: 26,
-                                                  ),
-                                                ),
-                                                enabledBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                      color: Colors.white,
-                                                      width: 3.0),
-                                                ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                    color: Colors.white,
-                                                    width: 3.0,
-                                                  ),
-                                              ),
-                                            ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 20),
-                                          SizedBox(
-                                            width: 400,
-                                            height: 60,
-                                            child: TextField(
-                                              decoration: InputDecoration(
-                                                labelStyle: GoogleFonts.poppins(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                                hintText: "confirm password",
-                                                 hintStyle: TextStyle(color: Colors.white),
-                                                labelText: "confirm password",
-                                                suffixIcon: InkWell(
-                                                  onTap: () {},
-                                                  child: Icon(
-                                                    Icons.visibility_outlined,
-                                                    color: Colors.white,
-                                                    size: 26,
-                                                  ),
-                                                ),
-                                               enabledBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                      color: Colors.white,
-                                                      width: 3.0),
-                                                ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                    color: Colors.white,
-                                                    width: 3.0,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 20),
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const HomeScreen(),
-                                                ),
-                                              );
-                                            },
-                                            child: Container(
-                                              width: 400,
-                                              height: 60,
-                                              alignment: Alignment.center,
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(20)),
-                                              ),
-                                              child: Text(
-                                                'Register',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xFF584A4A),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'Already have account?',
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Color(0xFF584A4A)),
-                                              ),
-                                              Text(
-                                                'Login',
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white),
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        );
+                        _showRegisterModal();
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -321,207 +246,38 @@ class SplashScreen extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF584A4A),
+                            color: const Color(0xFF584A4A),
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
-
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // LOGIN BUTTON
                     GestureDetector(
                       onTap: () {
-                        showModalBottomSheet(
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (context) {
-                            return StatefulBuilder(builder:
-                                (BuildContext context, StateSetter setState) {
-                              return Wrap(
-                                children: [
-                                  Container(
-                                  
-                                    height: 400,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFA0D7C8),
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(30),
-                                        topLeft: Radius.circular(30),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        SizedBox(
-                                          height: 30,
-                                        ),
-                                        Text(
-                                          'Login',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF584A4A),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        SizedBox(
-                                          width: 400,
-                                          height: 60,
-                                          child: TextField(
-                                            decoration: InputDecoration(
-                                              labelStyle: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              hintText: "ricko11@gmail.com",
-                                              hintStyle: TextStyle(color: Colors.white),
-                                              labelText: "Username/email",
-                                              enabledBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                      color: Colors.white,
-                                                      width: 3.0),
-                                                ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                    color: Colors.white,
-                                                    width: 3.0,
-                                                  ),
-                                                ),
-                                            ),
-                                          ),
-                                        ),
-
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-
-                                        SizedBox(
-                                          width: 400,
-                                          height: 60,
-                                          child: TextField(
-                                            decoration: InputDecoration(
-                                              labelStyle: GoogleFonts.poppins(
-                                                fontSize: 16,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                      color: Colors.white,
-                                                      width: 3.0),
-                                              ),
-                                              hintText: "12345678",
-                                               hintStyle: TextStyle(color: Colors.white),
-                                              labelText: "password",
-                                              suffixIcon: InkWell(
-                                                onTap: () {},
-                                                child: Icon(
-                                                  Icons.visibility_outlined,
-                                                  color: Colors.white,
-                                                  size: 26,
-                                                ),
-                                              ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  borderSide: BorderSide(
-                                                    color: Colors.white,
-                                                    width: 3.0,
-                                                  ),
-                                                ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                const HomeScreen(),
-                                                ));
-                                          },
-                                          child: Container(
-                                            width: 400,
-                                            height: 60,
-                                            alignment: Alignment.center,
-                                            decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(20)
-                                              ),
-                                            ),
-                                            child: Text(
-                                              'Login',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 16,
-                                                color: Color(0xFF584A4A),
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 20,),
-
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Don’t have an account?',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xFF584A4A),
-                                              ),
-                                            ),
-                                            Text(
-                                              'Register',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.white,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              );
-                            });
-                          },
-                        );
+                        _showLoginModal();
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 150, vertical: 20
-                        ),
+                            horizontal: 150, vertical: 20),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border.all(
-                            color: Color(0xFFA0D7C8),
+                            color: const Color(0xFFA0D7C8),
                             width: 3.0,
-                             ),
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          ),
+                          borderRadius: const BorderRadius.all(Radius.circular(20)),
                         ),
                         child: Text(
                           'Login',
                           style: GoogleFonts.poppins(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFFA0D7C8)
-                          ),
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFFA0D7C8)),
                         ),
                       ),
                     )
@@ -529,6 +285,357 @@ class SplashScreen extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Show Register Modal
+  void _showRegisterModal() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Wrap(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFA0D7C8),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(30),
+                        topLeft: Radius.circular(30),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Text(
+                          'Create Account',
+                          style: GoogleFonts.poppins(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF584A4A),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        _buildTextField(
+                          controller: _registerEmailController,
+                          hintText: "example@email.com",
+                          labelText: "Email",
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildTextField(
+                          controller: _registerCourseController,
+                          hintText: "Computer Science",
+                          labelText: "Course",
+                        ),
+                        const SizedBox(height: 20),
+                        _buildPasswordField(
+                          controller: _registerPasswordController,
+                          hintText: "password",
+                          labelText: "Password",
+                          isVisible: _isRegisterPasswordVisible,
+                          onToggleVisibility: () {
+                            setModalState(() {
+                              _isRegisterPasswordVisible = !_isRegisterPasswordVisible;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _buildPasswordField(
+                          controller: _registerConfirmPasswordController,
+                          hintText: "confirm password",
+                          labelText: "Confirm Password",
+                          isVisible: _isRegisterConfirmPasswordVisible,
+                          onToggleVisibility: () {
+                            setModalState(() {
+                              _isRegisterConfirmPasswordVisible = !_isRegisterConfirmPasswordVisible;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: _isRegisterLoading ? null : () async {
+                            setModalState(() {
+                              _isRegisterLoading = true;
+                            });
+                            await _register();
+                            setModalState(() {
+                              _isRegisterLoading = false;
+                            });
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 60,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: _isRegisterLoading ? Colors.grey : Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: _isRegisterLoading
+                                ? const CircularProgressIndicator(
+                                    color: Color(0xFF584A4A),
+                                  )
+                                : Text(
+                                    'Register',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF584A4A),
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showLoginModal();
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Already have account? ',
+                                style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF584A4A)),
+                              ),
+                              Text(
+                                'Login',
+                                style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Show Login Modal
+  void _showLoginModal() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Wrap(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFA0D7C8),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(30),
+                        topLeft: Radius.circular(30),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Text(
+                          'Login',
+                          style: GoogleFonts.poppins(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF584A4A),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        _buildTextField(
+                          controller: _loginEmailController,
+                          hintText: "example@email.com",
+                          labelText: "Email",
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildPasswordField(
+                          controller: _loginPasswordController,
+                          hintText: "password",
+                          labelText: "Password",
+                          isVisible: _isLoginPasswordVisible,
+                          onToggleVisibility: () {
+                            setModalState(() {
+                              _isLoginPasswordVisible = !_isLoginPasswordVisible;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: _isLoginLoading ? null : () async {
+                            setModalState(() {
+                              _isLoginLoading = true;
+                            });
+                            await _login();
+                            setModalState(() {
+                              _isLoginLoading = false;
+                            });
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 60,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: _isLoginLoading ? Colors.grey : Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: _isLoginLoading
+                                ? const CircularProgressIndicator(
+                                    color: Color(0xFF584A4A),
+                                  )
+                                : Text(
+                                    'Login',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      color: const Color(0xFF584A4A),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showRegisterModal();
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Don\'t have an account? ',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF584A4A),
+                                ),
+                              ),
+                              Text(
+                                'Register',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Build TextField Widget
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required String labelText,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 60,
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Colors.white),
+          labelText: labelText,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(color: Colors.white, width: 3.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(color: Colors.white, width: 3.0),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Build Password Field Widget
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String hintText,
+    required String labelText,
+    required bool isVisible,
+    required VoidCallback onToggleVisibility,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 60,
+      child: TextField(
+        controller: controller,
+        obscureText: !isVisible,
+        decoration: InputDecoration(
+          labelStyle: GoogleFonts.poppins(
+            fontSize: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Colors.white),
+          labelText: labelText,
+          suffixIcon: InkWell(
+            onTap: onToggleVisibility,
+            child: Icon(
+              isVisible ? Icons.visibility : Icons.visibility_off,
+              color: Colors.white,
+              size: 26,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(color: Colors.white, width: 3.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(color: Colors.white, width: 3.0),
           ),
         ),
       ),
