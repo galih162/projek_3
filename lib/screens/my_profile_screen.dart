@@ -57,7 +57,6 @@ class _MyProfileScreen extends State<MyProfileScreen> {
     }
   }
 
-  // Simpan profil ke Supabase
   Future<void> _saveProfile() async {
     final currentUser = await _supabaseService.getCurrentUser();
     final userId = currentUser['id'];
