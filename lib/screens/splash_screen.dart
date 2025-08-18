@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,16 +13,22 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final SupabaseService _supabaseService = SupabaseService();
-  
+
   // Controllers untuk form
-  final TextEditingController _registerEmailController = TextEditingController();
+  final TextEditingController _registerEmailController =
+      TextEditingController();
   final TextEditingController _registerNameController = TextEditingController();
-  final TextEditingController _registerCourseController = TextEditingController();
-  final TextEditingController _registerPhoneController = TextEditingController();
-  final TextEditingController _registerPasswordController = TextEditingController();
-  final TextEditingController _registerConfirmPasswordController = TextEditingController();
+  final TextEditingController _registerCourseController =
+      TextEditingController();
+  final TextEditingController _registerPhoneController =
+      TextEditingController();
+  final TextEditingController _registerPasswordController =
+      TextEditingController();
+  final TextEditingController _registerConfirmPasswordController =
+      TextEditingController();
   final TextEditingController _loginEmailController = TextEditingController();
-  final TextEditingController _loginPasswordController = TextEditingController();
+  final TextEditingController _loginPasswordController =
+      TextEditingController();
 
   // State untuk tanggal lahir
   DateTime? _registerBirthDate;
@@ -32,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
   bool _isRegisterPasswordVisible = false;
   bool _isRegisterConfirmPasswordVisible = false;
   bool _isLoginPasswordVisible = false;
-  
+
   // State untuk loading
   bool _isRegisterLoading = false;
   bool _isLoginLoading = false;
@@ -62,7 +67,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   // Register function
   Future<void> _register() async {
-    if (_registerPasswordController.text != _registerConfirmPasswordController.text) {
+    if (_registerPasswordController.text !=
+        _registerConfirmPasswordController.text) {
       _showSnackBar('Kata sandi tidak cocok!', isError: true);
       return;
     }
@@ -103,10 +109,12 @@ class _SplashScreenState extends State<SplashScreen> {
       _registerPasswordController.clear();
       _registerConfirmPasswordController.clear();
       _registerBirthDate = null;
-      
-      _showSnackBar('Akun berhasil dibuat! Silakan login dengan kredensial Anda.', isError: false);
+
+      _showSnackBar(
+          'Akun berhasil dibuat! Silakan login dengan kredensial Anda.',
+          isError: false);
       Navigator.pop(context); // Close register modal
-      
+
       // Otomatis buka login modal setelah register berhasil
       Future.delayed(const Duration(milliseconds: 500), () {
         _showLoginModal();
@@ -118,7 +126,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   // Login function
   Future<void> _login() async {
-    if (_loginEmailController.text.isEmpty || _loginPasswordController.text.isEmpty) {
+    if (_loginEmailController.text.isEmpty ||
+        _loginPasswordController.text.isEmpty) {
       _showSnackBar('Harap isi semua kolom!', isError: true);
       return;
     }
@@ -140,10 +149,10 @@ class _SplashScreenState extends State<SplashScreen> {
       // Clear login form
       _loginEmailController.clear();
       _loginPasswordController.clear();
-      
+
       _showSnackBar(result['message'], isError: false);
       Navigator.pop(context); // Close modal
-      
+
       // Navigate to home with proper route clearing
       Navigator.pushAndRemoveUntil(
         context,
@@ -234,7 +243,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 Column(
                   children: [
                     Text(
-                      'Atur hidup Anda',
+                      'Get organized  your life',
                       style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
@@ -243,13 +252,13 @@ class _SplashScreenState extends State<SplashScreen> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      'aplikasi daftar tugas dan pengelola tugas\n'
-                      'yang sederhana dan efektif\n'
-                      'untuk membantu Anda mengelola waktu\n',
+                      'simple and affective\n'
+                      'to-do list and task manager app\n'
+                      'which helps you manage time\n',
                       style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF584A4A),
+                        color: Color(0xFF584A4A),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -265,51 +274,53 @@ class _SplashScreenState extends State<SplashScreen> {
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 150, vertical: 20),
+                            horizontal: 50, vertical: 20),
                         decoration: const BoxDecoration(
                           color: Color(0xFFA0D7C8),
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         child: Text(
-                          'Buat Akun',
+                          'Create Account',
                           style: GoogleFonts.poppins(
                             fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF584A4A),
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF584A4A),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // LOGIN BUTTON
-                    GestureDetector(
-                      onTap: () {
-                        _showLoginModal();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 150, vertical: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: const Color(0xFFA0D7C8),
-                            width: 3.0,
+                    const SizedBox(height: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // LOGIN BUTTON
+                        GestureDetector(
+                          onTap: () {
+                            _showLoginModal();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 115, vertical: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                color: const Color(0xFFA0D7C8),
+                                width: 3.0,
+                              ),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: Text(
+                              'Login',
+                              style: GoogleFonts.poppins(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFFA0D7C8)),
+                            ),
                           ),
-                          borderRadius: const BorderRadius.all(Radius.circular(20)),
-                        ),
-                        child: Text(
-                          'Login',
-                          style: GoogleFonts.poppins(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFFA0D7C8)),
-                        ),
-                      ),
-                    )
+                        )
+                      ],
+                    ),
                   ],
                 ),
               ],
@@ -383,7 +394,8 @@ class _SplashScreenState extends State<SplashScreen> {
                       GestureDetector(
                         child: TextField(
                           readOnly: true,
-                          controller: TextEditingController(text: formatTanggal),
+                          controller:
+                              TextEditingController(text: formatTanggal),
                           onTap: () async {
                             final DateTime? picked = await showDatePicker(
                               context: context,
@@ -411,11 +423,13 @@ class _SplashScreenState extends State<SplashScreen> {
                             labelText: "Tanggal Lahir",
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(color: Colors.white, width: 3.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.white, width: 3.0),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(color: Colors.white, width: 3.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.white, width: 3.0),
                             ),
                           ),
                         ),
@@ -428,7 +442,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         isVisible: _isRegisterPasswordVisible,
                         onToggleVisibility: () {
                           setModalState(() {
-                            _isRegisterPasswordVisible = !_isRegisterPasswordVisible;
+                            _isRegisterPasswordVisible =
+                                !_isRegisterPasswordVisible;
                           });
                         },
                       ),
@@ -440,7 +455,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         isVisible: _isRegisterConfirmPasswordVisible,
                         onToggleVisibility: () {
                           setModalState(() {
-                            _isRegisterConfirmPasswordVisible = !_isRegisterConfirmPasswordVisible;
+                            _isRegisterConfirmPasswordVisible =
+                                !_isRegisterConfirmPasswordVisible;
                           });
                         },
                       ),
@@ -462,8 +478,10 @@ class _SplashScreenState extends State<SplashScreen> {
                           height: 60,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: _isRegisterLoading ? Colors.grey : Colors.white,
-                            borderRadius: const BorderRadius.all(Radius.circular(20)),
+                            color:
+                                _isRegisterLoading ? Colors.grey : Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
                           ),
                           child: _isRegisterLoading
                               ? const CircularProgressIndicator(
@@ -566,7 +584,8 @@ class _SplashScreenState extends State<SplashScreen> {
                           isVisible: _isLoginPasswordVisible,
                           onToggleVisibility: () {
                             setModalState(() {
-                              _isLoginPasswordVisible = !_isLoginPasswordVisible;
+                              _isLoginPasswordVisible =
+                                  !_isLoginPasswordVisible;
                             });
                           },
                         ),
@@ -588,8 +607,10 @@ class _SplashScreenState extends State<SplashScreen> {
                             height: 60,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: _isLoginLoading ? Colors.grey : Colors.white,
-                              borderRadius: const BorderRadius.all(Radius.circular(20)),
+                              color:
+                                  _isLoginLoading ? Colors.grey : Colors.white,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(20)),
                             ),
                             child: _isLoginLoading
                                 ? const CircularProgressIndicator(
