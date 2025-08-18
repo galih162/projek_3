@@ -12,7 +12,8 @@ class SupabaseService {
   Future<void> initialize() async {
     await Supabase.initialize(
       url: 'https://bowngxwubyzewhrzhwsf.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvd25neHd1Ynl6ZXdocnpod3NmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwNDU0MjksImV4cCI6MjA3MDYyMTQyOX0.XHuiK8hGLgaB7Sv4pE1pElCoQc3aJxJMU4hFZBCkTLA',
+      anonKey:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvd25neHd1Ynl6ZXdocnpod3NmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwNDU0MjksImV4cCI6MjA3MDYyMTQyOX0.XHuiK8hGLgaB7Sv4pE1pElCoQc3aJxJMU4hFZBCkTLA',
     );
     client = Supabase.instance.client;
   }
@@ -34,17 +35,22 @@ class SupabaseService {
 
       if (response.user != null) {
         // Simpan data profil ke tabel profiles
-        final profileResult = await client.from('profiles').insert({
-          'id': response.user!.id,
-          'email': email,
-          'name': name,
-          'course': course,
-          'birth_date': birthDate?.toIso8601String(),
-          'phone_number': phoneNumber,
-          'updated_at': DateTime.now().toIso8601String(),
-        }).select().single();
+        final profileResult = await client
+            .from('profiles')
+            .insert({
+              'id': response.user!.id,
+              'email': email,
+              'name': name,
+              'course': course,
+              'birth_date': birthDate?.toIso8601String(),
+              'phone_number': phoneNumber,
+              'updated_at': DateTime.now().toIso8601String(),
+            })
+            .select()
+            .single();
 
-        print('Pengguna terdaftar dan profil disimpan: ${profileResult['email']}');
+        print(
+            'Pengguna terdaftar dan profil disimpan: ${profileResult['email']}');
         return {
           'success': true,
           'message': 'Registrasi berhasil! Silakan login.',
@@ -102,10 +108,10 @@ class SupabaseService {
     try {
       final User? user = client.auth.currentUser;
       final Session? session = client.auth.currentSession;
-      
+
       print('Pengguna saat ini dari Supabase: ${user?.email}');
       print('Sesi saat ini ada: ${session != null}');
-      
+
       if (user != null && session != null) {
         await _saveUserToPrefs(user);
         return true;
@@ -190,16 +196,20 @@ class SupabaseService {
     String? course,
   }) async {
     try {
-      final response = await client.from('profiles').upsert({
-        'id': userId,
-        'email': email,
-        'name': name,
-        'bio': bio,
-        'birth_date': birthDate?.toIso8601String(),
-        'phone_number': phoneNumber,
-        'course': course,
-        'updated_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'id').select().single();
+      final response = await client
+          .from('profiles')
+          .upsert({
+            'id': userId,
+            'email': email,
+            'name': name,
+            'bio': bio,
+            'birth_date': birthDate?.toIso8601String(),
+            'phone_number': phoneNumber,
+            'course': course,
+            'updated_at': DateTime.now().toIso8601String(),
+          }, onConflict: 'id')
+          .select()
+          .single();
 
       print('Profil disimpan: ${response['email']}');
       return {
@@ -219,11 +229,8 @@ class SupabaseService {
   // Ambil data profil dari tabel profiles
   Future<Map<String, dynamic>> getUserProfile(String userId) async {
     try {
-      final response = await client
-          .from('profiles')
-          .select()
-          .eq('id', userId)
-          .maybeSingle();
+      final response =
+          await client.from('profiles').select().eq('id', userId).maybeSingle();
 
       if (response != null) {
         print('Profil ditemukan: ${response['email']}');
@@ -269,5 +276,23 @@ class SupabaseService {
       }
     }
     return 'Terjadi kesalahan: ${e.toString()}';
+  }
+
+  Future<Map<String, dynamic>> getUserTasks(String userId) async {
+    try {
+      final response =
+          await client.from('tasks').select().eq('user_id', userId);
+
+      return {
+        'success': true,
+        'data': response,
+      };
+    } catch (e) {
+      print('Kesalahan saat mengambil tasks: $e');
+      return {
+        'success': false,
+        'message': e.toString(),
+      };
+    }
   }
 }

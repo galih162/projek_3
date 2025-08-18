@@ -134,8 +134,9 @@ class _TaskDoneScreenState extends State<TaskDoneScreen> {
                         Text(
                           'Done To Do',
                           style: GoogleFonts.poppins(
-                            fontSize: 24,
+                            fontSize: 32,
                             fontWeight: FontWeight.w700,
+                            color: const Color(0xFF584A4A),
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -145,6 +146,7 @@ class _TaskDoneScreenState extends State<TaskDoneScreen> {
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
+                            color: const Color(0xFF584A4A),
                           ),
                         ),
                       ],
