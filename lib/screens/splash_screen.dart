@@ -320,7 +320,6 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  // Show Register Modal
   void _showRegisterModal() {
     showModalBottomSheet(
       isScrollControlled: true,
@@ -518,7 +517,6 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  // Show Login Modal
   void _showLoginModal() {
     showModalBottomSheet(
       isScrollControlled: true,

@@ -257,7 +257,6 @@ class SupabaseService {
     }
   }
 
-  // Helper untuk menangani pesan error
   String _getErrorMessage(dynamic e) {
     if (e is AuthException) {
       switch (e.message) {

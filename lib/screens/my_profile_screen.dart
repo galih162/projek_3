@@ -18,7 +18,7 @@ class _MyProfileScreen extends State<MyProfileScreen> {
   final TextEditingController _phoneController = TextEditingController();
   DateTime? tanggalTerpilih;
   Map<String, dynamic>? userProfile;
-  bool isLoading = true;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -26,10 +26,9 @@ class _MyProfileScreen extends State<MyProfileScreen> {
     _loadUserProfile();
   }
 
-  // Ambil data profil dari Supabase
   Future<void> _loadUserProfile() async {
     setState(() {
-      isLoading = true;
+      isLoading = false;
     });
     final currentUser = await _supabaseService.getCurrentUser();
     final userId = currentUser['id'];
@@ -58,7 +57,6 @@ class _MyProfileScreen extends State<MyProfileScreen> {
     }
   }
 
-  // Simpan profil ke Supabase
   Future<void> _saveProfile() async {
     final currentUser = await _supabaseService.getCurrentUser();
     final userId = currentUser['id'];
@@ -288,7 +286,7 @@ class _MyProfileScreen extends State<MyProfileScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          "Nomor TeleponSystem: or Telepon",
+                          "Nomor Telepon",
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
