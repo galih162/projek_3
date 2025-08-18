@@ -4,7 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
-import 'task_done_screen.dart'; // pastikan ini ada
+import 'task_done_screen.dart';
 
 class TaskTodoScreen extends StatefulWidget {
   const TaskTodoScreen({super.key});
@@ -56,12 +56,8 @@ class _TaskTodoScreenState extends State<TaskTodoScreen> {
   Future<void> getTasks() async {
     try {
       final userId = supabase.auth.currentUser!.id;
-
-      // Ambil task sesuai user yang login
-      final response = await supabase
-          .from('tasks')
-          .select()
-          .eq('user_id', userId); // <-- filter user_id
+      final response =
+          await supabase.from('tasks').select().eq('user_id', userId);
 
       List tasksFromDb = response;
 
@@ -71,25 +67,28 @@ class _TaskTodoScreenState extends State<TaskTodoScreen> {
             .compareTo(order[b['priority']] ?? 99);
       });
 
-      final mappedTasks = tasksFromDb.map((task) {
-        final category = (task['category'] ?? 'Other').toString();
-        final date = DateTime.parse(task['date']);
-        final String formattedDate = DateFormat('dd MMM yyyy').format(date);
-        final priority = (task['priority'] ?? 'Low').toString();
+      final mappedTasks = tasksFromDb
+          .map((task) {
+            final category = (task['category'] ?? 'Other').toString();
+            final date = DateTime.parse(task['date']);
+            final String formattedDate = DateFormat('dd MMM yyyy').format(date);
+            final priority = (task['priority'] ?? 'Low').toString();
 
-        return {
-          'id': task['id'],
-          'title': task['title'],
-          'subtitle': "$priority • $formattedDate",
-          'done': task['done'] ?? false,
-          'icon': getCategoryIcon(category),
-          'description': task['notes'] ?? '',
-          'category': category,
-          'date': formattedDate,
-          'time': task['time'] ?? '-',
-          'priority': priority,
-        };
-      }).toList();
+            return {
+              'id': task['id'],
+              'title': task['title'],
+              'subtitle': "$priority • $formattedDate",
+              'done': task['done'] ?? false,
+              'icon': getCategoryIcon(category),
+              'description': task['notes'] ?? '',
+              'category': category,
+              'date': formattedDate,
+              'time': task['time'] ?? '-',
+              'priority': priority,
+            };
+          })
+          .where((task) => task['done'] == false)
+          .toList();
 
       setState(() {
         tasks = mappedTasks;
@@ -377,38 +376,36 @@ class _TaskTodoScreenState extends State<TaskTodoScreen> {
                                 onChanged: (bool? value) async {
                                   final newValue = value ?? false;
 
-                                  // Update database
                                   try {
                                     await supabase
                                         .from('tasks')
                                         .update({'done': newValue}).eq(
                                             'id', task['id']);
+
+                                    setState(() {
+                                      if (newValue) {
+                                        tasks.removeAt(index);
+                                      } else {
+                                        tasks[index]['done'] = newValue;
+                                      }
+                                    });
+
+                                    if (newValue) {
+                                      Future.microtask(() {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const TaskDoneScreen()),
+                                        );
+                                      });
+                                    }
                                   } catch (e) {
-                                    // kalo error rollback UI
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content:
                                               Text("Gagal update status: $e")),
                                     );
-                                    return;
-                                  }
-
-                                  // Update UI
-                                  setState(() {
-                                    tasks[index]['done'] = newValue;
-                                  });
-
-                                  // Kalau sudah done, navigasi ke TaskDoneScreen
-                                  if (newValue) {
-                                    // Delay dikit supaya setState dulu jalan
-                                    Future.microtask(() {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const TaskDoneScreen()),
-                                      );
-                                    });
                                   }
                                 },
                               ),
