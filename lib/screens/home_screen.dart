@@ -29,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadTaskCounts();
   }
 
-  // Ambil data profil dari Supabase
   Future<void> _loadUserProfile() async {
     setState(() => isLoading = true);
     final currentUser = await _supabaseService.getCurrentUser();
@@ -43,7 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       } else {
         setState(() => isLoading = false);
-        _showSnackBar('Gagal memuat profil: ${result['message']}', isError: true);
+        _showSnackBar('Gagal memuat profil: ${result['message']}',
+            isError: true);
       }
     } else {
       setState(() => isLoading = false);
@@ -51,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Ambil task count dari Supabase
   Future<void> _loadTaskCounts() async {
     try {
       final currentUser = await _supabaseService.getCurrentUser();
@@ -71,7 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Tampilkan SnackBar
   void _showSnackBar(String message, {required bool isError}) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -91,7 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Refresh Home setelah balik dari CreateTaskScreen atau screen lain
   Future<void> _refreshHome() async {
     await _loadUserProfile();
     await _loadTaskCounts();
@@ -109,10 +106,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Header Profil
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 40),
                     decoration: const BoxDecoration(
                       boxShadow: [
-                        BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+                        BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 8,
+                            offset: Offset(0, 4)),
                       ],
                       gradient: LinearGradient(
                         colors: [Color(0xFFA0D7C8), Color(0xFFA0C7D7)],
@@ -133,10 +134,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             shape: BoxShape.circle,
                             color: Colors.white,
                             boxShadow: const [
-                              BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4)),
+                              BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4)),
                             ],
                           ),
-                          child: const Icon(Icons.account_circle_outlined, size: 70),
+                          child: const Icon(Icons.account_circle_outlined,
+                              size: 70),
                         ),
                         const SizedBox(width: 10),
                         Column(
@@ -191,7 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const TaskTodoScreen()),
+                              MaterialPageRoute(
+                                  builder: (_) => const TaskTodoScreen()),
                             ).then((_) => _refreshHome());
                           },
                           child: Container(
@@ -200,7 +206,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: const Color(0xFFA0D7C8),
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: const [
-                                BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+                                BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4)),
                               ],
                             ),
                             child: Row(
@@ -245,7 +254,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const TaskDoneScreen()),
+                              MaterialPageRoute(
+                                  builder: (_) => const TaskDoneScreen()),
                             ).then((_) => _refreshHome());
                           },
                           child: Container(
@@ -254,7 +264,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: const Color(0xFFA0D7C8),
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: const [
-                                BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+                                BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4)),
                               ],
                             ),
                             child: Row(
@@ -266,7 +279,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     shape: BoxShape.circle,
                                     color: Colors.white,
                                   ),
-                                  child: const Icon(Icons.check_circle_outline, size: 60),
+                                  child: const Icon(Icons.check_circle_outline,
+                                      size: 60),
                                 ),
                                 const SizedBox(width: 12),
                                 Column(
@@ -302,7 +316,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: const Color(0xFFA0D7C8),
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: const [
-                              BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+                              BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4)),
                             ],
                           ),
                           child: Row(
@@ -312,7 +329,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => CalenderScreen(userProfile: userProfile),
+                                      builder: (context) => CalenderScreen(
+                                          userProfile: userProfile),
                                     ),
                                   ).then((_) => _refreshHome());
                                 },
@@ -325,7 +343,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         shape: BoxShape.circle,
                                         color: Colors.white,
                                       ),
-                                      child: const Icon(Icons.calendar_month, size: 60),
+                                      child: const Icon(Icons.calendar_month,
+                                          size: 60),
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
@@ -354,7 +373,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: const Color(0xFFA0D7C8),
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: const [
-                          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+                          BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              offset: Offset(0, 4)),
                         ],
                       ),
                       child: Text(
@@ -406,7 +428,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(builder: (_) => const MyProfileScreen()),
                 ).then((_) => _refreshHome());
               },
-              icon: const Icon(Icons.person, color: Color(0xFF584A4A), size: 45),
+              icon:
+                  const Icon(Icons.person, color: Color(0xFF584A4A), size: 45),
             ),
           ],
         ),

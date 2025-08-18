@@ -115,7 +115,6 @@ class _SplashScreenState extends State<SplashScreen> {
           isError: false);
       Navigator.pop(context); // Close register modal
 
-      // Otomatis buka login modal setelah register berhasil
       Future.delayed(const Duration(milliseconds: 500), () {
         _showLoginModal();
       });
@@ -152,8 +151,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
       _showSnackBar(result['message'], isError: false);
       Navigator.pop(context); // Close modal
-
-      // Navigate to home with proper route clearing
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -164,7 +161,6 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  // Show snackbar
   void _showSnackBar(String message, {required bool isError}) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

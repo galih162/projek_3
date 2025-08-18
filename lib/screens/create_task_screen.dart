@@ -75,7 +75,6 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
 
       showTopSnackBar(context, '✅ Task Saved Successfully');
     } catch (e) {
-      // kalau error
       showTopSnackBar(context, '❌ Error: $e');
     }
   }

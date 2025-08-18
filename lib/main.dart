@@ -6,7 +6,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseService().initialize();
   
-  runApp(const TodoApp(title: 'My Todo App')); // kirim title di sini
+  runApp(const TodoApp(title: 'My Todo App'));
 }
 
 class TodoApp extends StatelessWidget {

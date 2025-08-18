@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CalenderScreen extends StatefulWidget {
-  final Map<String, dynamic>? userProfile; // Ambil data user dari HomeScreen
+  final Map<String, dynamic>? userProfile;
 
   const CalenderScreen({super.key, this.userProfile});
 
@@ -48,7 +48,6 @@ class _CalenderScreenState extends State<CalenderScreen> {
   Widget build(BuildContext context) {
     final userName = widget.userProfile?['name'] ?? 'Pengguna';
 
-    // generate 7 hari sekitar sekarang
     final days = List.generate(7, (i) {
       final date = DateTime.now().add(Duration(days: i - 2));
       return DateFormat('yyyy-MM-dd').format(date);
@@ -61,7 +60,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
         title: Text(
           'Today',
           style: GoogleFonts.poppins(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF584A4A)),
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF584A4A)),
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Color(0xFF584A4A)),
@@ -76,7 +77,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
             child: Text(
               'Productive Day, $userName',
               style: GoogleFonts.poppins(
-                  fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF584A4A)),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF584A4A)),
             ),
           ),
           Padding(
@@ -84,7 +87,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
             child: Text(
               DateFormat('MMMM dd, yyyy').format(DateTime.now()),
               style: GoogleFonts.poppins(
-                  fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF584A4A)),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF584A4A)),
             ),
           ),
           SizedBox(height: 20),
@@ -110,7 +115,8 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     margin: EdgeInsets.only(right: 12),
                     width: 45,
                     decoration: BoxDecoration(
-                      color: isSelected ? Color(0xFFA0D7C8) : Colors.transparent,
+                      color:
+                          isSelected ? Color(0xFFA0D7C8) : Colors.transparent,
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
@@ -118,7 +124,8 @@ class _CalenderScreenState extends State<CalenderScreen> {
                       '$dayNum',
                       style: GoogleFonts.poppins(
                           fontSize: 16,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
                           color: isSelected ? Colors.black : Colors.grey),
                     ),
                   ),
@@ -134,7 +141,8 @@ class _CalenderScreenState extends State<CalenderScreen> {
                   ? Center(
                       child: Text(
                         'No tasks today!',
-                        style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
+                        style: GoogleFonts.poppins(
+                            color: Colors.grey, fontSize: 16),
                       ),
                     )
                   : ListView.builder(
@@ -153,14 +161,16 @@ class _CalenderScreenState extends State<CalenderScreen> {
                               Text(
                                 task['time'] ?? '-',
                                 style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w600, color: Color(0xFF584A4A)),
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF584A4A)),
                               ),
                               SizedBox(width: 20),
                               Expanded(
                                 child: Text(
                                   task['title'] ?? '-',
                                   style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600, color: Color(0xFF584A4A)),
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF584A4A)),
                                 ),
                               ),
                             ],
