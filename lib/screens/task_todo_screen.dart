@@ -346,19 +346,40 @@ class _TaskTodoScreenState extends State<TaskTodoScreen> {
                               trailing: Checkbox(
                                 value: task['done'],
                                 onChanged: (bool? value) async {
-                                  await supabase.from('tasks').update(
-                                      {'done': value}).eq('id', task['id']);
-                                  setState(() {
-                                    tasks[index]['done'] = value ?? false;
-                                  });
-                                  if (value == true) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const TaskDoneScreen(),
-                                      ),
+                                  final newValue = value ?? false;
+
+                                  // Update database
+                                  try {
+                                    await supabase
+                                        .from('tasks')
+                                        .update({'done': newValue}).eq(
+                                            'id', task['id']);
+                                  } catch (e) {
+                                    // kalo error rollback UI
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content:
+                                              Text("Gagal update status: $e")),
                                     );
+                                    return;
+                                  }
+
+                                  // Update UI
+                                  setState(() {
+                                    tasks[index]['done'] = newValue;
+                                  });
+
+                                  // Kalau sudah done, navigasi ke TaskDoneScreen
+                                  if (newValue) {
+                                    // Delay dikit supaya setState dulu jalan
+                                    Future.microtask(() {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const TaskDoneScreen()),
+                                      );
+                                    });
                                   }
                                 },
                               ),
