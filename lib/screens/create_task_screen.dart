@@ -48,8 +48,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     try {
       final session = supabase.auth.currentSession;
       if (session == null) {
-        throw Exception('Session is null');
+        throw Exception('User belum login!');
       }
+
+      final userId = supabase.auth.currentUser!.id;
 
       // Insert data ke Supabase
       await supabase.from('tasks').insert({
@@ -59,11 +61,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         'date': formatTanggal,
         'time': formatWaktu,
         'notes': notesController.text,
+        'user_id': userId,
       });
 
       titleController.clear();
       notesController.clear();
-
       setState(() {
         kategoriTerpilih = null;
         prioritasTerpilih = null;

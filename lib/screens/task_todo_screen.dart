@@ -54,37 +54,51 @@ class _TaskTodoScreenState extends State<TaskTodoScreen> {
   }
 
   Future<void> getTasks() async {
-    final response = await supabase.from('tasks').select();
-    List tasksFromDb = response;
+    try {
+      final userId = supabase.auth.currentUser!.id;
 
-    tasksFromDb.sort((a, b) {
-      const order = {'High': 1, 'Mid': 2, 'Low': 3};
-      return (order[a['priority']] ?? 99).compareTo(order[b['priority']] ?? 99);
-    });
+      // Ambil task sesuai user yang login
+      final response = await supabase
+          .from('tasks')
+          .select()
+          .eq('user_id', userId); // <-- filter user_id
 
-    final mappedTasks = tasksFromDb.map((task) {
-      final category = (task['category'] ?? 'Other').toString();
-      final date = DateTime.parse(task['date']);
-      final String formattedDate = DateFormat('dd MMM yyyy').format(date);
-      final priority = (task['priority'] ?? 'Low').toString();
+      List tasksFromDb = response;
 
-      return {
-        'id': task['id'],
-        'title': task['title'],
-        'subtitle': "$priority • $formattedDate",
-        'done': task['done'] ?? false,
-        'icon': getCategoryIcon(category),
-        'description': task['notes'] ?? '',
-        'category': category,
-        'date': formattedDate,
-        'time': task['time'] ?? '-',
-        'priority': priority,
-      };
-    }).toList();
+      tasksFromDb.sort((a, b) {
+        const order = {'High': 1, 'Mid': 2, 'Low': 3};
+        return (order[a['priority']] ?? 99)
+            .compareTo(order[b['priority']] ?? 99);
+      });
 
-    setState(() {
-      tasks = mappedTasks;
-    });
+      final mappedTasks = tasksFromDb.map((task) {
+        final category = (task['category'] ?? 'Other').toString();
+        final date = DateTime.parse(task['date']);
+        final String formattedDate = DateFormat('dd MMM yyyy').format(date);
+        final priority = (task['priority'] ?? 'Low').toString();
+
+        return {
+          'id': task['id'],
+          'title': task['title'],
+          'subtitle': "$priority • $formattedDate",
+          'done': task['done'] ?? false,
+          'icon': getCategoryIcon(category),
+          'description': task['notes'] ?? '',
+          'category': category,
+          'date': formattedDate,
+          'time': task['time'] ?? '-',
+          'priority': priority,
+        };
+      }).toList();
+
+      setState(() {
+        tasks = mappedTasks;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal ambil task: $e")),
+      );
+    }
   }
 
   void showDeleteDialog(String id) {
@@ -274,14 +288,29 @@ class _TaskTodoScreenState extends State<TaskTodoScreen> {
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_back_ios_new_rounded)),
                   Expanded(
-                    child: Text(
-                      'To Do Day',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF584A4A),
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'To Do Day',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF584A4A),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          DateFormat('EEEE, dd MMMM yyyy')
+                              .format(DateTime.now()),
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF584A4A),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 24),
