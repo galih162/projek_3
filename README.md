@@ -1,4 +1,4 @@
-# projek2_aplikasi_todolist
+# Projek 3 "Aplikasi TODO LIST"
 
 A new Flutter project.
 
