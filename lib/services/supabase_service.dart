@@ -70,7 +70,7 @@ class SupabaseService {
     }
   }
 
-  // Login pengguna
+  // Login user
   Future<Map<String, dynamic>> loginUser({
     required String email,
     required String password,
