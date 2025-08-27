@@ -125,7 +125,6 @@ class SupabaseService {
       return false;
     }
   }
-
   // Logout pengguna
   Future<void> logoutUser() async {
     try {
