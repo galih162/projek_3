@@ -1,16 +1,3 @@
-# Projek 3 "Aplikasi TODO LIST"
+***PROJEK 3 APLIKASI TODO LIST (MENAMBAHKAN DATABASE)***
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Link Flowchart : https://www.figma.com/board/0kIEURa9G5FZXeWfkuGfs0/Flow-projek-3?node-id=0-1&p=f&t=loKzvGNNO3kVPfRi-0
