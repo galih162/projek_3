@@ -42,8 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       } else {
         setState(() => isLoading = false);
-        _showSnackBar('Gagal memuat profil: ${result['message']}',
-            isError: true);
+        _showSnackBar(
+          'Gagal memuat profil: ${result['message']}',
+          isError: true,
+        );
       }
     } else {
       setState(() => isLoading = false);
@@ -78,7 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
             message,
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontSize: 17,
+              fontSize:
+                  MediaQuery.of(context).size.width *
+                  0.04, // Responsive font size
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -96,6 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: SafeArea(
         child: isLoading
@@ -107,14 +114,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Header Profil
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 40),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.075, // 30/400 ~ 7.5%
+                        vertical: screenHeight * 0.05, // 40/800 ~ 5%
+                      ),
                       decoration: const BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 8,
-                              offset: Offset(0, 4)),
+                            color: Colors.black12,
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
                         ],
                         gradient: LinearGradient(
                           colors: [Color(0xFFA0D7C8), Color(0xFFA0C7D7)],
@@ -129,22 +139,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         children: [
                           Container(
-                            width: 80,
-                            height: 80,
+                            width: screenWidth * 0.2, // 80/400 ~ 20%
+                            height: screenWidth * 0.2,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.white,
                               boxShadow: const [
                                 BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 4)),
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
+                                ),
                               ],
                             ),
-                            child: const Icon(Icons.account_circle_outlined,
-                                size: 70),
+                            child: Icon(
+                              Icons.account_circle_outlined,
+                              size: screenWidth * 0.175, // 70/400 ~ 17.5%
+                            ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: screenWidth * 0.025), // 10/400 ~ 2.5%
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -152,24 +165,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                 'Hello,',
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w800,
-                                  fontSize: 24,
-                                  color: Color(0xFF584A4A),
+                                  fontSize: screenWidth * 0.06, // 24/400 ~ 6%
+                                  color: const Color(0xFF584A4A),
                                 ),
                               ),
                               Text(
                                 userProfile?['name'] ?? 'Pengguna',
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w800,
-                                  fontSize: 24,
-                                  color: Color(0xFF584A4A),
+                                  fontSize: screenWidth * 0.06,
+                                  color: const Color(0xFF584A4A),
                                 ),
                               ),
                               Text(
                                 userProfile?['bio'] ?? 'Bio belum diatur',
                                 style: GoogleFonts.poppins(
-                                  fontSize: 15,
+                                  fontSize:
+                                      screenWidth * 0.0375, // 15/400 ~ 3.75%
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF584A4A),
+                                  color: const Color(0xFF584A4A),
                                 ),
                               ),
                             ],
@@ -177,55 +191,68 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: screenHeight * 0.025), // 20/800 ~ 2.5%
                     // My Task & Calendar
                     Padding(
-                      padding: const EdgeInsets.all(30),
+                      padding: EdgeInsets.all(
+                        screenWidth * 0.075,
+                      ), // 30/400 ~ 7.5%
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'My Task',
                             style: GoogleFonts.poppins(
-                              fontSize: 24,
+                              fontSize: screenWidth * 0.06, // 24/400 ~ 6%
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF584A4A),
+                              color: const Color(0xFF584A4A),
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: screenHeight * 0.0125,
+                          ), // 10/800 ~ 1.25%
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) =>
-                                        const TaskTodoScreen()), //memanggil halaman
+                                  builder: (_) => const TaskTodoScreen(),
+                                ),
                               ).then((_) => _refreshHome());
                             },
                             child: Container(
-                              padding: const EdgeInsets.all(20),
+                              padding: EdgeInsets.all(
+                                screenWidth * 0.05,
+                              ), // 20/400 ~ 5%
                               decoration: BoxDecoration(
                                 color: const Color(0xFFA0D7C8),
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: const [
                                   BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 8,
-                                      offset: Offset(0, 4)),
+                                    color: Colors.black12,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
+                                  ),
                                 ],
                               ),
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 70,
-                                    height: 70,
+                                    width:
+                                        screenWidth * 0.175, // 70/400 ~ 17.5%
+                                    height: screenWidth * 0.175,
                                     decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.white,
                                     ),
-                                    child: const Icon(Icons.schedule, size: 60),
+                                    child: Icon(
+                                      Icons.schedule,
+                                      size: screenWidth * 0.15, // 60/400 ~ 15%
+                                    ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(
+                                    width: screenWidth * 0.03,
+                                  ), // 12/400 ~ 3%
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -233,17 +260,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'To Do',
                                         style: GoogleFonts.poppins(
-                                          fontSize: 20,
+                                          fontSize:
+                                              screenWidth * 0.05, // 20/400 ~ 5%
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF584A4A),
+                                          color: const Color(0xFF584A4A),
                                         ),
                                       ),
                                       Text(
-                                        '$todoCount Task Now', // jelaskan ini
+                                        '$todoCount Task Now',
                                         style: GoogleFonts.poppins(
-                                          fontSize: 15,
+                                          fontSize:
+                                              screenWidth *
+                                              0.0375, // 15/400 ~ 3.75%
                                           fontWeight: FontWeight.w500,
-                                          color: Color(0xFF584A4A),
+                                          color: const Color(0xFF584A4A),
                                         ),
                                       ),
                                     ],
@@ -252,42 +282,51 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: screenHeight * 0.025,
+                          ), // 20/800 ~ 2.5%
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) =>
-                                        const TaskDoneScreen()), // jelaskan
+                                  builder: (_) => const TaskDoneScreen(),
+                                ),
                               ).then((_) => _refreshHome());
                             },
                             child: Container(
-                              padding: const EdgeInsets.all(20),
+                              padding: EdgeInsets.all(
+                                screenWidth * 0.05,
+                              ), // 20/400 ~ 5%
                               decoration: BoxDecoration(
                                 color: const Color(0xFFA0D7C8),
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: const [
                                   BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 8,
-                                      offset: Offset(0, 4)),
+                                    color: Colors.black12,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
+                                  ),
                                 ],
                               ),
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 70,
-                                    height: 70,
+                                    width:
+                                        screenWidth * 0.175, // 70/400 ~ 17.5%
+                                    height: screenWidth * 0.175,
                                     decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.white,
                                     ),
-                                    child: const Icon(
-                                        Icons.check_circle_outline,
-                                        size: 60),
+                                    child: Icon(
+                                      Icons.check_circle_outline,
+                                      size: screenWidth * 0.15, // 60/400 ~ 15%
+                                    ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(
+                                    width: screenWidth * 0.03,
+                                  ), // 12/400 ~ 3%
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -295,17 +334,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'Done',
                                         style: GoogleFonts.poppins(
-                                          fontSize: 20,
+                                          fontSize:
+                                              screenWidth * 0.05, // 20/400 ~ 5%
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF584A4A),
+                                          color: const Color(0xFF584A4A),
                                         ),
                                       ),
                                       Text(
-                                        '$todoCount Task Now | $doneCount Task Done', // jelaskan
+                                        '$todoCount Task Now | $doneCount Task Done',
                                         style: GoogleFonts.poppins(
-                                          fontSize: 15,
+                                          fontSize:
+                                              screenWidth *
+                                              0.0375, // 15/400 ~ 3.75%
                                           fontWeight: FontWeight.w500,
-                                          color: Color(0xFF584A4A),
+                                          color: const Color(0xFF584A4A),
                                         ),
                                       ),
                                     ],
@@ -314,7 +356,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: screenHeight * 0.025,
+                          ), // 20/800 ~ 2.5%
                           // Calendar Appointment Card
                           GestureDetector(
                             onTap: () {
@@ -329,28 +373,41 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: _taskCard(
                               icon: Icons.calendar_month,
                               title: "Calendar Appointment",
+                              style: GoogleFonts.poppins(
+                                fontSize:
+                                    screenWidth *
+                                    0.0375, // Responsive font size (15px for 400px screen)
+                                fontWeight: FontWeight.w600,
+                                color: Colors
+                                    .black, // Added explicit color for consistency
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 20),
-
+                          SizedBox(
+                            height: screenHeight * 0.025,
+                          ), // 20/800 ~ 2.5%
                           // Thank You Card
                           Center(
                             child: Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: EdgeInsets.all(
+                                screenWidth * 0.03,
+                              ), // 12/400 ~ 3%
                               decoration: BoxDecoration(
                                 color: const Color(0xFFA0D7C8),
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: const [
                                   BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 8,
-                                      offset: Offset(0, 4)),
+                                    color: Colors.black12,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
+                                  ),
                                 ],
                               ),
                               child: Text(
                                 "Terima Kasih sudah menjadi manusia \nbertanggung jawab\nKlik tombol '+' di bawah untuk tambah tugas",
                                 style: GoogleFonts.poppins(
-                                  fontSize: 15,
+                                  fontSize:
+                                      screenWidth * 0.0375, // 15/400 ~ 3.75%
                                   fontWeight: FontWeight.w600,
                                 ),
                                 textAlign: TextAlign.center,
@@ -364,12 +421,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
       ),
-
       // Floating Button
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: SizedBox(
-        height: 80,
-        width: 80,
+        height: screenWidth * 0.2, // 80/400 ~ 20%
+        width: screenWidth * 0.2,
         child: FloatingActionButton(
           shape: const CircleBorder(),
           backgroundColor: const Color(0xFFA0D7C8),
@@ -380,10 +436,13 @@ class _HomeScreenState extends State<HomeScreen> {
               MaterialPageRoute(builder: (_) => const CreateTaskScreen()),
             ).then((_) => _refreshHome());
           },
-          child: const Icon(Icons.add, size: 40, color: Colors.black),
+          child: Icon(
+            Icons.add,
+            size: screenWidth * 0.1, // 40/400 ~ 10%
+            color: Colors.black,
+          ),
         ),
       ),
-
       // Bottom Navigation
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -393,9 +452,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             IconButton(
               onPressed: _refreshHome,
-              icon: const Icon(Icons.home, color: Color(0xFF584A4A), size: 45),
+              icon: Icon(
+                Icons.home,
+                color: const Color(0xFF584A4A),
+                size: screenWidth * 0.1125, // 45/400 ~ 11.25%
+              ),
             ),
-            const SizedBox(width: 120),
+            SizedBox(width: screenWidth * 0.3), // 120/400 ~ 30%
             IconButton(
               onPressed: () {
                 Navigator.push(
@@ -403,8 +466,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(builder: (_) => const MyProfileScreen()),
                 ).then((_) => _refreshHome());
               },
-              icon:
-                  const Icon(Icons.person, color: Color(0xFF584A4A), size: 45),
+              icon: Icon(
+                Icons.person,
+                color: const Color(0xFF584A4A),
+                size: screenWidth * 0.1125, // 45/400 ~ 11.25%
+              ),
             ),
           ],
         ),
@@ -416,10 +482,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _taskCard({
     required IconData icon,
     required String title,
+    TextStyle? style,
     String? subtitle,
   }) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(screenWidth * 0.05), // 20/400 ~ 5%
       decoration: BoxDecoration(
         color: const Color(0xFFA0D7C8),
         borderRadius: BorderRadius.circular(12),
@@ -430,15 +498,18 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           Container(
-            width: 70,
-            height: 70,
+            width: screenWidth * 0.175, // 70/400 ~ 17.5%
+            height: screenWidth * 0.175,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white,
             ),
-            child: Icon(icon, size: 60),
+            child: Icon(
+              icon,
+              size: screenWidth * 0.15, // 60/400 ~ 15%
+            ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: screenWidth * 0.03), // 12/400 ~ 3%
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,18 +517,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   title,
                   style: GoogleFonts.poppins(
-                    fontSize: 20,
+                    fontSize: screenWidth * 0.05, // 20/400 ~ 5%
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF584A4A),
+                    color: const Color(0xFF584A4A),
                   ),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle,
                     style: GoogleFonts.poppins(
-                      fontSize: 15,
+                      fontSize: screenWidth * 0.0375, // 15/400 ~ 3.75%
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF584A4A),
+                      color: const Color(0xFF584A4A),
                     ),
                   ),
               ],
