@@ -80,8 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
             message,
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontSize:
-                  MediaQuery.of(context).size.width *
+              fontSize: MediaQuery.of(context).size.width *
                   0.04, // Responsive font size
               fontWeight: FontWeight.w500,
             ),
@@ -269,8 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         '$todoCount Task Now',
                                         style: GoogleFonts.poppins(
-                                          fontSize:
-                                              screenWidth *
+                                          fontSize: screenWidth *
                                               0.0375, // 15/400 ~ 3.75%
                                           fontWeight: FontWeight.w500,
                                           color: const Color(0xFF584A4A),
@@ -343,8 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         '$todoCount Task Now | $doneCount Task Done',
                                         style: GoogleFonts.poppins(
-                                          fontSize:
-                                              screenWidth *
+                                          fontSize: screenWidth *
                                               0.0375, // 15/400 ~ 3.75%
                                           fontWeight: FontWeight.w500,
                                           color: const Color(0xFF584A4A),
@@ -374,8 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icons.calendar_month,
                               title: "Calendar Appointment",
                               style: GoogleFonts.poppins(
-                                fontSize:
-                                    screenWidth *
+                                fontSize: screenWidth *
                                     0.0375, // Responsive font size (15px for 400px screen)
                                 fontWeight: FontWeight.w600,
                                 color: Colors
@@ -487,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      padding: EdgeInsets.all(screenWidth * 0.05), // 20/400 ~ 5%
+      padding: EdgeInsets.all(screenWidth * 0.04),
       decoration: BoxDecoration(
         color: const Color(0xFFA0D7C8),
         borderRadius: BorderRadius.circular(12),
@@ -498,15 +494,15 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           Container(
-            width: screenWidth * 0.175, // 70/400 ~ 17.5%
-            height: screenWidth * 0.175,
+            width: screenWidth * 0.15,
+            height: screenWidth * 0.15,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white,
             ),
             child: Icon(
               icon,
-              size: screenWidth * 0.15, // 60/400 ~ 15%
+              size: screenWidth * 0.12,
             ),
           ),
           SizedBox(width: screenWidth * 0.03), // 12/400 ~ 3%
@@ -517,10 +513,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   title,
                   style: GoogleFonts.poppins(
-                    fontSize: screenWidth * 0.05, // 20/400 ~ 5%
+                    fontSize: screenWidth * 0.045, 
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF584A4A),
                   ),
+                  overflow: TextOverflow.ellipsis, 
+                  maxLines: 2, 
+                  textAlign: TextAlign.left,
                 ),
                 if (subtitle != null)
                   Text(
